@@ -1,0 +1,113 @@
+@import '../styles/variables.css';
+
+/* Ajustando el toolbar para mantener padding, permitir scroll lateral y mover el after con el contenido desplazado */
+
+.toolbar {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  background: var(--toolbar-bg);
+  padding: 12px 16px; /* Mantener el padding */
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.02);
+  z-index: 2;
+  align-items: center;
+  flex-wrap: nowrap; /* Evitar que los elementos se envuelvan */
+  transition: opacity 0.3s ease; /* Añadir transición para la opacidad */
+}
+
+.toolbar-container::-webkit-scrollbar {
+  display: none; /* Ocultar scrollbar en Webkit */
+}
+
+.toolbar-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 20px; /* Ancho de la difuminación */
+  background: linear-gradient(to left, var(--toolbar-bg), transparent);
+  pointer-events: none; /* Permitir interacción con el contenido debajo */
+  transition: opacity 0.2s ease;
+  opacity: 1;
+}
+
+.toolbar-container.hide-fade::after {
+  opacity: 0;
+}
+
+.button-group button {
+  background: var(--button-bg);
+  border: none;
+  font-size: 1.1rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  color: var(--fg);
+}
+.button-group {
+  display: flex;
+  gap: 2px; /* Espacio entre botones del grupo */
+}
+
+.button-group button:first-child {
+  border-radius: 10px 0 0 10px;
+}
+.button-group button:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.toolbar button.active {
+  background: var(--toolbar-active);
+  color: var(--toolbar-active-fg);
+}
+
+.toolbar button:hover:not(.active) {
+  background: var(--button-bg);
+  color: var(--fg);
+}
+
+.toolbar-container {
+  display: flex;
+  gap: 10px;
+
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .toolbar-container {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  #mainToolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center; /* Centrar el contenido */
+    padding: 8px 0px;
+    opacity: 1; /* Visible por defecto */
+    transition: bottom 0.3s ease; /* Añadir transición para la opacidad */
+    
+  }
+
+  .toolbar-hidden {
+    opacity: 0; /* Hacerlo invisible */
+    height: 0;
+    
+  }
+
+  .toolbar-container {
+    flex-wrap: nowrap;
+    overflow-x: auto; /* Permitir scroll lateral */
+    scrollbar-width: none; /* Ocultar scrollbar en Firefox */
+    padding: 0 8px; /* Añadir padding horizontal para evitar que el contenido toque los bordes */
+  }
+}

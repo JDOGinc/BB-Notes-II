@@ -1,0 +1,22 @@
+/* Variables globales para temas y colores */
+[data-theme="light"] {
+  --bg: #f9f9f9;
+  --fg: #222;
+  --toolbar-bg: #fff;
+  --toolbar-border: #e0e0e0;
+  --toolbar-active: #d1e0f3;
+  --toolbar-active-fg: #1552a9;
+  --editor-area-bg: #f9f9f9;
+  --button-bg: #f0f0f0;
+}
+
+[data-theme="dark"] {
+  --bg: #18181b;
+  --fg: #f4f4f5;
+  --toolbar-bg: #000;
+  --toolbar-border: #2a2a32;
+  --toolbar-active: #0f336a;
+  --toolbar-active-fg: #84acf2;
+  --editor-area-bg: #23232a;
+  --button-bg: #3d3d3d;
+}

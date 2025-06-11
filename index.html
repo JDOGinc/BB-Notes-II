@@ -3,10 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Vite + React</title>
+    
+    <style>
+      /* Oculta todo hasta que el tema esté aplicado */
+      body:not([data-theme]) {
+        opacity: 0;
+      }
+      body[data-theme] {
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+      }
+    </style>
+
+    <script>
+      // Esperar a que React Native establezca window.isDarkMode
+      const waitForTheme = () => {
+        if (typeof window.isDarkMode !== 'undefined') {
+          const theme = window.isDarkMode ? 'dark' : 'light';
+          document.body.setAttribute('data-theme', theme);
+        } else {
+          requestAnimationFrame(waitForTheme);
+        }
+      };
+      waitForTheme();
+    </script>
+
   </head>
-  <body>
+  <body data-theme="ligth">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
