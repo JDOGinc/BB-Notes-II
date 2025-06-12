@@ -70,7 +70,7 @@ const Toolbar = ({ editorState, onToggleInline, onToggleBlock }) => {
   };
 
   return (
-    <div id='mainToolbar' className={toolbarHeight === 0 ? 'toolbar-hidden': 'toolbar'} style={{ bottom: toolbarHeight }}>
+    <div className='toolbar' style={ toolbarHeight == 0 ? {opacity: 0, pointerEvents: 'none'} : { opacity: 1}}>
       <div className="toolbar-container" ref={containerRef}>
         <div className='button-group'>
             <button

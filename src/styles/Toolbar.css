@@ -62,10 +62,6 @@
   color: var(--toolbar-active-fg);
 }
 
-.toolbar button:hover:not(.active) {
-  background: var(--button-bg);
-  color: var(--fg);
-}
 
 .toolbar-container {
   display: flex;
@@ -85,7 +81,7 @@
 }
 
 @media (max-width: 768px) {
-  #mainToolbar {
+  .toolbar {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -94,14 +90,7 @@
     justify-content: center; /* Centrar el contenido */
     padding: 8px 0px;
     opacity: 1; /* Visible por defecto */
-    transition: bottom 0.3s ease; /* Añadir transición para la opacidad */
-    
-  }
-
-  .toolbar-hidden {
-    opacity: 0; /* Hacerlo invisible */
-    height: 0;
-    
+    transition: bottom 0.3s ease , opacity 0.3s ease;
   }
 
   .toolbar-container {

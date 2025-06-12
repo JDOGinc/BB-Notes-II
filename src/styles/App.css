@@ -22,7 +22,7 @@ body, html, #root, .editor-container {
 
 .editor-area {
   flex: 1;
-  padding: 16px; /* Reducir el padding para minimizar la separación */
+  padding: 16px 16px 70px 16px; /* Reducir el padding para minimizar la separación */
   overflow-y: auto; /* Scroll solo en el cuadro de texto */
   background: var(--editor-area-bg);
   transition: background 0.2s;
