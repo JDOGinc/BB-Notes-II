@@ -23,6 +23,14 @@ function MainEditor() {
   const handleEditorChange = useCallback((newEditorState) => {
     onChange(newEditorState);
   }, [onChange]);
+
+   const handleBeforeInput = (input, editorState) => {
+    // Si detecta dos espacios seguidos, evita la entrada de otro espacio
+    if (input === ' ' && editorState.getCurrentContent().getLastCharacter() === ' ') {
+      return 'handled';
+    }
+    return 'not-handled';
+  };
   
 
   return (
@@ -48,6 +56,7 @@ function MainEditor() {
                 placeholder="Escribe aquí..."
                 spellCheck={true}
                 ref={editorRef}
+                handleBeforeInput={handleBeforeInput}
                 
               />
             </div>
