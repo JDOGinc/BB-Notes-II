@@ -3,7 +3,7 @@
 .bible-ref {
   color: var(--toolbar-active-fg);
   background-color: var(--bible-ref-bg);
-  padding: 3px 6px;
+  padding: 0px 5px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
