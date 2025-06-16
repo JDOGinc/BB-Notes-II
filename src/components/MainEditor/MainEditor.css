@@ -1,0 +1,30 @@
+
+@import '../../styles/variables.css';
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw; /* Asegurar que ocupe todo el ancho */
+  background: var(--bg);
+  color: var(--fg);
+  transition: background 0.2s, color 0.2s;
+  box-sizing: border-box; /* Incluir padding y border en el tamaño total */
+}
+
+.editor-area {
+  flex: 1;
+  padding: 16px 16px 70px 16px; /* Reducir el padding para minimizar la separación */
+  overflow-y: auto; /* Scroll solo en el cuadro de texto */
+  background: var(--editor-area-bg);
+  transition: background 0.2s;
+  box-sizing: border-box; /* Incluir padding y border en el tamaño total */
+}
+
+.DraftEditor-root {
+  min-height: 100%;
+  font-size: 1.1rem;
+  outline: none;
+  color: var(--fg);
+  box-sizing: border-box; /* Incluir padding y border en el tamaño total */
+}

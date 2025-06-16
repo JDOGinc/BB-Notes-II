@@ -1,18 +1,21 @@
 import React from 'react';
-import { BLOCK_TYPES } from '../constants/BlockTypes';
-import '../styles/Toolbar.css';
+import { BLOCK_TYPES } from '../../constants/BlockTypes';
+import './Toolbar.css';
 import { useEffect, useState, useRef } from 'react';
+import { useBridge } from '../../hooks/useBridge';
+import useStyling from '../../hooks/useStyling';
 
-const Toolbar = ({ editorState, onToggleInline, onToggleBlock }) => {
-  const currentStyle = editorState.getCurrentInlineStyle();
-  const selection = editorState.getSelection();
-  const blockType = editorState
-    .getCurrentContent()
-    .getBlockForKey(selection.getStartKey())
-    .getType();
+const Toolbar = () => {
+  const { toggleInlineStyle, toggleBlockType, getCurrentStyle, getCurrentBlockType } = useStyling();
+
+  const currentStyle = getCurrentStyle();
+  const blockType = getCurrentBlockType();
+    
   const [toolbarHeight, setToolbarHeight] = useState(0);
   const containerRef = useRef(null);
+  const { onMessage } = useBridge();
 
+  // Mnejar el scroll del toolbar y ocultar el fade al final
   useEffect(() => {
     const container = containerRef.current;
 
@@ -34,39 +37,26 @@ const Toolbar = ({ editorState, onToggleInline, onToggleBlock }) => {
     };
   }, []);
 
- useEffect(() => {
-  const handleMessage = (event) => {
-    let data;
-
-    try {
-      data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-    } catch (e) {
-      return e;
-    }
-
-    const { type, keyboardHeight } = data;
-
-    if (type === 'keyboardShown') {
-      console.log('Keyboard shown with height:', keyboardHeight);
-      setToolbarHeight(keyboardHeight);
-    } else if (type === 'keyboardHidden') {
+  // Escuchar mensajes de la app para ajustar la altura del toolbar sobre el teclado
+  useEffect(() => {
+    onMessage('KB_SHOWN', (payload) => {
+      console.log('Keyboard shown with height:', payload);
+      setToolbarHeight(payload);
+    });
+    onMessage('KB_HIDDEN', () => {
       console.log('Keyboard hidden');
       setToolbarHeight(0);
-    }
-  };
-
-  window.addEventListener('message', handleMessage);
-  return () => window.removeEventListener('message', handleMessage);
-}, []);
+    });
+  }, [onMessage]);
 
   const handleInlineClick = (e, style) => {
     e.preventDefault();
-    onToggleInline(style); // Toggle the style
+    toggleInlineStyle(style); // Toggle the style
   };
 
   const handleBlockClick = (e, type) => {
     e.preventDefault();
-    onToggleBlock(type === blockType ? 'unstyled' : type); // Toggle the block type
+    toggleBlockType(type === blockType ? 'unstyled' : type); // Toggle the block type
   };
 
   return (
