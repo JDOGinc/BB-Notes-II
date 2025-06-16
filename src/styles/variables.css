@@ -8,6 +8,7 @@
   --toolbar-active-fg: #1552a9;
   --editor-area-bg: #f9f9f9;
   --button-bg: #f0f0f0;
+  --bible-ref-bg: #e0dede;
 }
 
 [data-theme="dark"] {
@@ -19,4 +20,5 @@
   --toolbar-active-fg: #84acf2;
   --editor-area-bg: #23232a;
   --button-bg: #3d3d3d;
+  --bible-ref-bg: #3d3d3d;
 }

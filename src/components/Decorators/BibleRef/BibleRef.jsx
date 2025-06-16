@@ -1,41 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './BibleRef.css';
+import { useBridge } from '../../../hooks/useBridge';
 
 const BibleVerse = ({ children }) => {
-  const [showPopup, setShowPopup] = useState(false);
+    const {sendMessage} = useBridge();
+    const bibleRefTxt = children[0]?.props?.text || '';
 
-  // Simulación del versículo (puedes hacer un fetch real aquí)
-  const verseText = '“Vosotros sois la luz del mundo…”';
+    const splitReference = (ref) => {
+        // Desestructuramos la referencia usando la lógica anterior
+        const [bookAndChapter, versesPart] = ref.split(":");
 
-  const togglePopup = () => {
-    setShowPopup((prev) => !prev);
-  };
+        // Obtenemos el libro y el capítulo
+        const book = bookAndChapter.match(/(?:[1-3]?[a-zA-Z]+)/)[0].toLowerCase();
+        const chapter = parseInt(bookAndChapter.match(/\d+/)[0]);
+
+        // Procesar versículos
+        let arrayVerses = [];
+        if (versesPart.includes(",")) {
+            arrayVerses = versesPart.split(",").flatMap((part) => {
+            if (part.includes("-")) {
+                const [start, end] = part.split("-").map((verse) => parseInt(verse));
+                return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+            } else {
+                return [parseInt(part)];
+            }
+            });
+        } else if (versesPart.includes("-")) {
+            const [start, end] = versesPart.split("-").map((verse) => parseInt(verse));
+            if (start > end) {
+            return { book, chapter, arrayVerses: null, versesPart };
+            }
+            arrayVerses = Array.from(
+            { length: end - start + 1 },
+            (_, i) => start + i
+            );
+        } else {
+            arrayVerses = [parseInt(versesPart)];
+        }
+        arrayVerses = Array.from(new Set(arrayVerses)).sort((a, b) => a - b);
+
+        return { book, chapter, arrayVerses, versesPart };
+    };
+
+    const fetchBibleRef = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!bibleRefTxt) {
+            console.warn('No se encontró una referencia bíblica válida.');
+            return;
+        }
+        const { book, chapter, arrayVerses, versesPart } = splitReference(bibleRefTxt);
+        const data = {
+            book,
+            chapter,
+            verses: arrayVerses,
+            versesPart,
+        };
+        sendMessage({type: 'BIBLE_REF', payload: data});
+        console.log('Referencia enviada:', data);
+    };
 
   return (
     <span className='bible-ref'
-      onClick={togglePopup}
+      onClick={(e) =>fetchBibleRef(e)}
     >
       {children}
-      {showPopup && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '1.5em',
-            left: 0,
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            padding: '8px',
-            borderRadius: '4px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            zIndex: 10,
-            minWidth: '200px',
-          }}
-        >
-          <strong>Versículo:</strong>
-          <p style={{ margin: '6px 0' }}>{verseText}</p>
-          <button onClick={() => setShowPopup(false)}>Cerrar</button>
-        </div>
-      )}
     </span>
   );
 };

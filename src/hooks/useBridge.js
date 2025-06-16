@@ -27,7 +27,7 @@ export function useBridge() {
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  // Enviar mensaje a la app
+  // Enviar mensaje a la app, recibes un objeto con tipo y payload
   const sendMessage = (data) => {
     if (window.ReactNativeWebView?.postMessage) {
       window.ReactNativeWebView.postMessage(JSON.stringify(data));
