@@ -4,9 +4,11 @@ import './Toolbar.css';
 import { useEffect, useState, useRef } from 'react';
 import { useBridge } from '../../hooks/useBridge';
 import useStyling from '../../hooks/useStyling';
+import { useEditor } from '../../contexts/EditorContext';
 
 const Toolbar = () => {
   const { toggleInlineStyle, toggleBlockType, getCurrentStyle, getCurrentBlockType } = useStyling();
+  const { saveDoc } = useEditor();
 
   const currentStyle = getCurrentStyle();
   const blockType = getCurrentBlockType();
@@ -52,6 +54,7 @@ const Toolbar = () => {
   const handleInlineClick = (e, style) => {
     e.preventDefault();
     toggleInlineStyle(style); // Toggle the style
+    saveDoc(); // Guardar el documento después de aplicar el estilo
   };
 
   const handleBlockClick = (e, type) => {

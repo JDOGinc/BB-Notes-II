@@ -7,15 +7,11 @@ import {
   useRef,
   useEffect,
 } from 'react';
-import { EditorState, CompositeDecorator } from 'draft-js';
-import { Document } from '../models/Document';
-import { v4 as uuidv4 } from 'uuid';
+import { EditorState, CompositeDecorator, convertToRaw, convertFromRaw } from 'draft-js';
 import BibleVerse from '../components/Decorators/BibleRef/BibleRef';
 import { findBibleVerses } from '../utils/findBibleVerses';
 
 const EditorContext = createContext();
-
-
 
 export const EditorProvider = ({ children }) => {
   const [currentDoc, setCurrentDoc] = useState(null);
@@ -28,72 +24,51 @@ export const EditorProvider = ({ children }) => {
     },
   ]), []);
 
-  const getFirstBlockText = useCallback((editorState) => {
-    if (!editorState) return null;
-    const text = editorState.getCurrentContent().getFirstBlock().getText().trim();
-    return text || 'Nueva nota';
-  }, []);
-
-  const getSecondBlockText = useCallback((editorState) => {
-    if (!editorState) return null;
-    const contentState = editorState.getCurrentContent();
-    const firstBlock = contentState.getFirstBlock();
-    const afterBlock = contentState.getBlockAfter(firstBlock.getKey());
-    return afterBlock ? afterBlock.getText().trim().slice(0, 40) : 'Ningún texto adicional';
-  }, []);
-
   const onChange = useCallback((newEditorState) => {
     if (!currentDoc) return;
+    setCurrentDoc(newEditorState);
+  }, [currentDoc]);
 
-    const oldContent = currentDoc.editorState.getCurrentContent().getPlainText();
-    const newContent = newEditorState.getCurrentContent().getPlainText();
-    const haveChanges = oldContent !== newContent;
+  const openDoc = useCallback((doc) => {
+  if (doc && doc !== '') {
+    //hacemos un timeout para evitar problemas de sincronización
+      setTimeout(() => {
+      }, 500);
+      const raw = JSON.parse(doc); // el JSON string recibido
+      const contentState = convertFromRaw(raw);
+      const newState = EditorState.createWithContent(contentState, bibleDecorator);
+      setCurrentDoc(newState);
+  }else{
+      const initialEditorState = EditorState.createEmpty(bibleDecorator);
+      setCurrentDoc(initialEditorState);
+  }
 
-    const selectionState = newEditorState.getSelection();
-    const inlineStyles = newEditorState.getCurrentInlineStyle();
+}, [bibleDecorator]);
 
-    let editorStateToReturn = EditorState.forceSelection(newEditorState, selectionState);
-    editorStateToReturn = EditorState.setInlineStyleOverride(editorStateToReturn, inlineStyles);
-
-    const newDoc = {
-      ...currentDoc,
-      title: getFirstBlockText(newEditorState) || 'Nueva nota',
-      content: getSecondBlockText(newEditorState) || 'Ningún texto adicional',
-      modificationDate: haveChanges ? Date.now() : currentDoc.modificationDate,
-      editorState: editorStateToReturn,
-      isSaved: haveChanges ? false : currentDoc.isSaved,
-    };
-
-    setCurrentDoc(newDoc);
-  }, [currentDoc, getFirstBlockText, getSecondBlockText]);
-
-  const createDoc = useCallback(() => {
-    const newDoc = new Document(
-      uuidv4(),
-      'Nueva nota',
-      'Ningún texto adicional',
-      Date.now(),
-      Date.now(),
-      EditorState.createEmpty(bibleDecorator),
-      true,
-      false
-    );
-    setCurrentDoc(newDoc);
-  }, [bibleDecorator]);
+const saveDoc = useCallback(() => {
+    if (!currentDoc) return;
+    const rawContent = convertToRaw(currentDoc.getCurrentContent());
+    const json = JSON.stringify(rawContent);
+    console.log('Saving document:', json);
+    return json;
+}, [currentDoc]);
 
   useEffect(() => {
     if (!currentDoc) {
-      createDoc();
+      const initialEditorState = EditorState.createEmpty(bibleDecorator);
+      setCurrentDoc(initialEditorState);
     }
-  }, [createDoc, currentDoc]);
+  }, [currentDoc, bibleDecorator]);
 
   const value = useMemo(() => ({
     currentDoc,
     setCurrentDoc,
-    createDoc,
     onChange,
     editorRef,
-  }), [currentDoc, createDoc, onChange, editorRef]);
+    bibleDecorator,
+    openDoc,
+    saveDoc,
+  }), [currentDoc, onChange, editorRef, bibleDecorator, openDoc, saveDoc]);
 
   return (
     <EditorContext.Provider value={value}>

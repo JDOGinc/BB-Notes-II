@@ -6,28 +6,28 @@ const useStyling = () => {
 
   // Función para alternar estilos en línea (negrita, cursiva, etc.)
   const toggleInlineStyle = (style) => {
-    if (!currentDoc || !currentDoc.editorState) return;
+    if (!currentDoc) return;
     console.log('toggleInlineStyle', style);
-    const newEditorState = RichUtils.toggleInlineStyle(currentDoc.editorState, style);
+    const newEditorState = RichUtils.toggleInlineStyle(currentDoc, style);
     onChange(newEditorState);
   };
 
   // Función para alternar estilos de lista
   const toggleBlockType = (blockType) => {
-    if (!currentDoc || !currentDoc.editorState) return;
+    if (!currentDoc) return;
     console.log('toggleBlockType', blockType);
-    const newEditorState = RichUtils.toggleBlockType(currentDoc.editorState, blockType);
+    const newEditorState = RichUtils.toggleBlockType(currentDoc, blockType);
     onChange(newEditorState);  
   };
 
   const getCurrentStyle = () =>{
-    return currentDoc.editorState.getCurrentInlineStyle();
+    return currentDoc.getCurrentInlineStyle();
   };
 
   const getCurrentBlockType = () =>{
 
-    const selection = currentDoc.editorState.getSelection();
-    const blockType = currentDoc.editorState
+    const selection = currentDoc.getSelection();
+    const blockType = currentDoc
         .getCurrentContent()
         .getBlockForKey(selection.getStartKey())
         .getType();

@@ -36,13 +36,19 @@ export function useBridge() {
     }
   };
 
-  // Suscribirse a un tipo específico de mensaje
   const onMessage = (type, callback) => {
-    if (!listeners.current[type]) {
-      listeners.current[type] = [];
-    }
-    listeners.current[type].push(callback);
+  if (!listeners.current[type]) {
+    listeners.current[type] = [];
+  }
+
+  listeners.current[type].push(callback);
+
+  // Devolver función de limpieza
+  return () => {
+    listeners.current[type] = listeners.current[type].filter(cb => cb !== callback);
   };
+};
+
 
   return { sendMessage, onMessage };
 }
