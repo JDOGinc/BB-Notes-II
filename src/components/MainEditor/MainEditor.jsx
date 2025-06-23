@@ -1,4 +1,4 @@
-import { useEffect, useCallback, use } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Editor } from 'draft-js';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import './MainEditor.css';
