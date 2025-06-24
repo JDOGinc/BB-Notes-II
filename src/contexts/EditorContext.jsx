@@ -17,12 +17,13 @@ export const EditorProvider = ({ children }) => {
   const [currentDoc, setCurrentDoc] = useState(null);
   const editorRef = useRef(null);
 
-  const bibleDecorator = useMemo(() => new CompositeDecorator([
+  const getBibleDecorator = (editorRef) => new CompositeDecorator([
     {
       strategy: findBibleVerses,
-      component: BibleVerse,
+      component: (props) => <BibleVerse {...props} editorRef={editorRef} />, // 👈 aquí pasas editorRef
     },
-  ]), []);
+  ]);
+
 
   const onChange = useCallback((newEditorState) => {
     if (!currentDoc) return;
@@ -30,20 +31,20 @@ export const EditorProvider = ({ children }) => {
   }, [currentDoc]);
 
   const openDoc = useCallback((doc) => {
-  if (doc && doc !== '') {
-    //hacemos un timeout para evitar problemas de sincronización
-      setTimeout(() => {
-      }, 500);
-      const raw = JSON.parse(doc); // el JSON string recibido
+    const decorator = getBibleDecorator(editorRef);
+    
+    if (doc && doc !== '') {
+      setTimeout(() => {}, 500);
+      const raw = JSON.parse(doc);
       const contentState = convertFromRaw(raw);
-      const newState = EditorState.createWithContent(contentState, bibleDecorator);
+      const newState = EditorState.createWithContent(contentState, decorator);
       setCurrentDoc(newState);
-  }else{
-      const initialEditorState = EditorState.createEmpty(bibleDecorator);
+    } else {
+      const initialEditorState = EditorState.createEmpty(decorator);
       setCurrentDoc(initialEditorState);
-  }
+    }
+  }, []);
 
-}, [bibleDecorator]);
 
 const saveDoc = useCallback(() => {
     if (!currentDoc) return;
@@ -54,21 +55,22 @@ const saveDoc = useCallback(() => {
 }, [currentDoc]);
 
   useEffect(() => {
-    if (!currentDoc) {
-      const initialEditorState = EditorState.createEmpty(bibleDecorator);
-      setCurrentDoc(initialEditorState);
-    }
-  }, [currentDoc, bibleDecorator]);
+  if (!currentDoc) {
+    const decorator = getBibleDecorator(editorRef);
+    const initialEditorState = EditorState.createEmpty(decorator);
+    setCurrentDoc(initialEditorState);
+  }
+}, [currentDoc]);
+
 
   const value = useMemo(() => ({
     currentDoc,
     setCurrentDoc,
     onChange,
     editorRef,
-    bibleDecorator,
     openDoc,
     saveDoc,
-  }), [currentDoc, onChange, editorRef, bibleDecorator, openDoc, saveDoc]);
+  }), [currentDoc, onChange, editorRef, openDoc, saveDoc]);
 
   return (
     <EditorContext.Provider value={value}>
