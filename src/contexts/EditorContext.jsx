@@ -10,13 +10,17 @@ import {
 import { EditorState, CompositeDecorator, convertToRaw, convertFromRaw } from 'draft-js';
 import BibleVerse from '../components/Decorators/BibleRef/BibleRef';
 import { findBibleVerses } from '../utils/findBibleVerses';
+import hash from 'object-hash';
+import { useBridge } from '../hooks/useBridge';
+
 
 const EditorContext = createContext();
 
 export const EditorProvider = ({ children }) => {
   const [currentDoc, setCurrentDoc] = useState(null);
+  const { sendMessage } = useBridge();
   const editorRef = useRef(null);
-
+  const lastSavedHashRef = useRef(null);
   const bibleDecorator = useMemo(() => new CompositeDecorator([
     {
       strategy: findBibleVerses,
@@ -45,13 +49,23 @@ export const EditorProvider = ({ children }) => {
 
 }, [bibleDecorator]);
 
-const saveDoc = useCallback(() => {
-    if (!currentDoc) return;
-    const rawContent = convertToRaw(currentDoc.getCurrentContent());
+const saveDoc = useCallback((state) => {
+    if (!state) return;
+    const rawContent = convertToRaw(state.getCurrentContent());
     const json = JSON.stringify(rawContent);
-    console.log('Saving document:', json);
-    return json;
-}, [currentDoc]);
+    const currentHash = hash(rawContent);
+    const lastHash = lastSavedHashRef.current;
+
+    if (lastHash === currentHash) {
+      console.log('Contenido sin cambios (hash igual), no se guarda');
+      return null;
+    }
+
+    lastSavedHashRef.current = currentHash;
+    sendMessage({ type: 'DOCUMENT_SAVED', payload: json });
+    console.log('Documento guardado automáticamente:', json);
+
+}, []);
 
   useEffect(() => {
     if (!currentDoc) {

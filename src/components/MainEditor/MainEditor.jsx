@@ -1,16 +1,15 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { Editor } from 'draft-js';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import './MainEditor.css';
 import Toolbar from '../Toolbar/Toolbar';
 import { useBridge } from '../../hooks/useBridge';
 import { useEditor } from '../../contexts/EditorContext';
-import { EditorState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 function MainEditor() {
   const {currentDoc, onChange, editorRef, openDoc, saveDoc} = useEditor();
-
+  const saveTimeoutRef = useRef(null);
   const { onMessage, sendMessage } = useBridge();
 
   // Escuchar mensajes entrantes
@@ -44,12 +43,21 @@ function MainEditor() {
   });
 
   return unsubscribe;
-}, [onMessage, saveDoc]);
+}, [onMessage, saveDoc, sendMessage]);
 
 
   const handleEditorChange = useCallback((newEditorState) => {
+    
     onChange(newEditorState);
-  }, [onChange]);
+    
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      saveDoc(newEditorState);
+    }, 2000);
+  }, [onChange, saveDoc]);
 
    const handleBeforeInput = (input, editorState) => {
     // Si detecta dos espacios seguidos, evita la entrada de otro espacio
