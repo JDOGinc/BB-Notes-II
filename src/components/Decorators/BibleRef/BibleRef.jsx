@@ -2,7 +2,7 @@ import React from 'react';
 import './BibleRef.css';
 import { useBridge } from '../../../hooks/useBridge';
 
-const BibleVerse = ({ children, editorRef }) => {
+const BibleVerse = ({ children }) => {
     const {sendMessage} = useBridge();
     const bibleRefTxt = children[0]?.props?.text || '';
 
@@ -43,7 +43,6 @@ const BibleVerse = ({ children, editorRef }) => {
     };
 
     const fetchBibleRef = (e) => {
-        editorRef && editorRef.current?.blur(); // Desenfocar el editor si está enfocado
         e.preventDefault();
         e.stopPropagation();
         if (!bibleRefTxt) {
