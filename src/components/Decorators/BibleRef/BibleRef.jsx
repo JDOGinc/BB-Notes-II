@@ -45,6 +45,7 @@ const BibleVerse = ({ children }) => {
     const fetchBibleRef = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        document.activeElement.blur();
         if (!bibleRefTxt) {
             console.warn('No se encontró una referencia bíblica válida.');
             return;
