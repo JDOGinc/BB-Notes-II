@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { Editor } from 'draft-js';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import './MainEditor.css';
@@ -11,6 +11,7 @@ function MainEditor() {
   const {currentDoc, onChange, editorRef, openDoc, saveDoc} = useEditor();
   const saveTimeoutRef = useRef(null);
   const { onMessage, sendMessage } = useBridge();
+  const [ readOnly, setReadOnly ] = useState(false);
 
   // Escuchar mensajes entrantes
   useEffect(() => {
@@ -29,7 +30,14 @@ function MainEditor() {
     });
     return unsubscribe;
   }, [onMessage, openDoc]);
-      
+  
+  useEffect(() => {
+    const unsubscribe = onMessage('TOGGLE_READ_MODE', (payload) => {
+      console.log('TOGGLE_READ_MODE', payload);
+      setReadOnly(!readOnly);
+    });
+    return unsubscribe;
+  }, [onMessage, readOnly]);
 
   useEffect(() => {
   const unsubscribe = onMessage('SAVE_DOCUMENT', () => {
@@ -92,6 +100,7 @@ function MainEditor() {
                 spellCheck={true}
                 ref={editorRef}
                 handleBeforeInput={handleBeforeInput}
+                readOnly={readOnly}
                 
               />
             </div>
